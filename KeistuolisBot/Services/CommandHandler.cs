@@ -22,8 +22,31 @@ namespace KeistuolisBot.Services
             _config = config;
 
             _discord.Ready += OnReady;
+            _discord.MessageReceived += OnMessageReceived;
         }
+        
 
+        private async Task OnMessageReceived(SocketMessage arg)
+        {
+            if (!(arg is SocketUserMessage)) return;
+            var msg = arg as SocketUserMessage;
+
+            if (msg.Author.IsBot) return;
+            var context = new SocketCommandContext(_discord, msg);
+
+            int pos = 0;
+            if(msg.HasStringPrefix(_config["prefix"], ref pos) || msg.HasMentionPrefix(_discord.CurrentUser, ref pos))
+            {
+                var result = await _commands.ExecuteAsync(context, pos, _provider);
+                if (!result.IsSuccess)
+                {
+                    var reason = result.Error;
+                    await context.Channel.SendMessageAsync($"**The following error ocurred:** \n{reason}");
+                    Console.Error.WriteLine(reason);
+                }
+            }
+
+        }
         private Task OnReady()
         {
             Console.WriteLine($"Connected as {_discord.CurrentUser.Username}#{_discord.CurrentUser.Discriminator}");
