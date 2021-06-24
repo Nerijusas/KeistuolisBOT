@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using KeistuolisBot.Common;
 
 namespace KeistuolisBot.Modules
 {
@@ -26,6 +27,14 @@ namespace KeistuolisBot.Modules
                 await Context.Channel.SendMessageAsync($"{messages.Count() - 1} messages deleted successfully!");
             await Task.Delay(2000);
             await message.DeleteAsync();
+        }
+
+
+        [Command("test")]
+        public async Task Test()
+        {
+            WeirdEmbedBuilder builder = new WeirdEmbedBuilder();
+            await ReplyAsync(embed: builder.Build());
         }
     }
 }
